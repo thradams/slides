@@ -763,17 +763,9 @@ int main() {
     <li>If it looks like a function, then it is a function.</li>
     <li>No forced capture strategy (by reference, by copy, stack, heap, etc.).</li>
     <li>Works with existing APIs that use <code>void *</code> callbacks</li>
-    <li>Lifetime problems may exist, but they are not new</li>
+    <li>No new problems. Lifetime issues may exist, but they are not new.</li>
+    <li>We are adding convenience improving safety and maintainability.</li>
     <li>Keeps the compiler simple</li>
-  </ul>
-</section>
-<!---------------------------------------------------------------------------------------------->
-<section>
-  <h2> Next steps</h2>
-  <ul>
-    <li> Improving the proposal, add wording</li>
-    <li> Deciding on forward-declaration syntax</li>
-    <li> Experimental implementation (Cake — missing VM type constraints)</li>
   </ul>
 </section>
 <!---------------------------------------------------------------------------------------------->
@@ -785,6 +777,15 @@ int main() {
   <div class="note">This is exactly what most C community wants. Provide some convenient syntax for functions which usage is very localized and delegate all issues with passing captures and ensuring their lifetime are delegated to the programmer. </div>
   <div class="note">Lambdas with no captures would be a simple and very convenient addition to C. It's quite frustrating that this feature did not land in C23. </div>
   <div class="note">Keep the language small and simple. Keep the spirit of C.</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Road map</h2>
+  <ul>
+    <li> Improving the proposal, add wording maybe merge in one proposal?</li>
+    <li> Deciding on forward-declaration syntax</li>
+    <li> Experimental implementation http://cakecc.org/ (missing VM types)</li>
+  </ul>
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>

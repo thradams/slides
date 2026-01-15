@@ -569,17 +569,9 @@ int main() {
 - If it looks like a function, then it is a function.
 - No forced capture strategy (by reference, by copy, stack, heap, etc.).
 - Works with existing APIs that use `void *` callbacks
-- Lifetime problems may exist, but they are not new
+- No new problems. Lifetime issues may exist, but they are not new.
+- We are adding convenience improving safety and maintainability.
 - Keeps the compiler simple
-
-
-## Next steps
-
--  Improving the proposal, add wording
--  Deciding on forward-declaration syntax
--  Experimental implementation (Cake — missing VM type constraints)
-
-
 
 ## Positive feedback on reddit
 
@@ -595,6 +587,13 @@ int main() {
 
 > Keep the language small and simple. Keep the spirit of C.
 
+
+
+## Road map
+
+-  Improving the proposal, add wording maybe merge in one proposal?
+-  Deciding on forward-declaration syntax
+-  Experimental implementation http://cakecc.org/ (missing VM types)
 
 
 ## References
