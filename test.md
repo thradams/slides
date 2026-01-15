@@ -6,95 +6,95 @@
 ## Motivation
 
 ```c
- void async(void* data, void (*callback)(int result, void* data));
+void async(void* data, void (*callback)(int result, void* data));
 
-    struct start_capture {
-        int value;
-    };
+struct start_capture {
+   int value;
+};
 
-    static void start_callback(int result, void* data) {
-        struct start_capture* capture = data;
-        free(capture);
-    }
+static void start_callback(int result, void* data) {
+   struct start_capture* capture = data;
+   free(capture);
+}
 
-    void start() {
-       struct start_capture* capture = calloc(1, sizeof *capture);
-       async(capture, start_callback);
-    }
+void start() {
+   struct start_capture* capture = calloc(1, sizeof *capture);
+   async(capture, start_callback);
+}
 ```
 
 ## do this, then that...
 
 ```csmall
 void part1_async(void* data, void (*callback)(int result, void* data));
-    void part2_async(void* data, void (*callback)(int result, void* data));
+void part2_async(void* data, void (*callback)(int result, void* data));
 
-    struct part1_capture {
-        int value;
-    };
+struct part1_capture {
+   int value;
+};
 
-    struct part2_capture {
-        char ch;
-    };
+struct part2_capture {
+   char ch;
+};
 
-    static void part2_complete(int result, void* data);
+static void part2_complete(int result, void* data);
 
-    static void part1_complete(int result, void* data) {
-       struct part1_capture* capture1 = data;
+static void part1_complete(int result, void* data) {
+   struct part1_capture* capture1 = data;
 
-        struct part2_capture* capture2 = calloc(1, sizeof *capture2);
-        part2_async(capture2, part2_complete);
+   struct part2_capture* capture2 = calloc(1, sizeof *capture2);
+   part2_async(capture2, part2_complete);
 
-        free(capture2);
-    }
+   free(capture2);
+}
 
-    static void part2_complete(int result, void* data) {
-       struct part2_capture* capture2 = data;
-       free(capture2);
-    }
+static void part2_complete(int result, void* data) {
+   struct part2_capture* capture2 = data;
+   free(capture2);
+}
 
-    void start() {
-       struct part1_capture* capture1 = calloc(1, sizeof *capture1);
-       part1_async(capture1, part1_complete);
-    }
+void start() {
+   struct part1_capture* capture1 = calloc(1, sizeof *capture1);
+   part1_async(capture1, part1_complete);
+}
 ```
 
 ## Local functions
 ```c
 void async(void* data, void (*callback)(int result, void* data));
 
-    void start() {
+void start() {
        
-       struct capture {
-            int value;
-        };
+   struct capture {
+      int value;
+   };
 
-       static void callback(int result, void* data) {
-            struct capture* capture = data;
-            free(capture);
-       }
+   static void callback(int result, void* data) {
+      struct capture* capture = data;
+      free(capture);
+   }
        
-       struct capture* capture = calloc(1, sizeof * capture);
-       async(capture, callback);
-    }
+   struct capture* capture = calloc(1, sizeof * capture);
+   async(capture, callback);
+}
 ```
 
 ## Literal functions
 ```c
-    void async(void* data, void (*callback)(int result, void* data));
+void async(void* data, void (*callback)(int result, void* data));
 
-    void start() {
+void start() {
        
-       struct capture {
-            int value;
-       } capture = calloc(1, sizeof * capture);
+   struct capture {
+      int value;
+   } capture = calloc(1, sizeof * capture);
 
-       async(capture, (void (int result, void* data)) 
-       {
-          struct capture* capture = data;
-          free(capture);
-       });
-    }
+   async(capture, (void (int result, void* data)) 
+   {
+      struct capture* capture = data;
+      free(capture);
+   });
+}
 ```
 
 ## Reusing captures
@@ -117,15 +117,58 @@ int main()
     });
 }
 ```
+## Captures on Stack
+
+```c
+#include <stdio.h>
+
+void for_each_file(const char* path, 
+                   void* data,
+                   void (*f)(void* data, const char* filename)){}
+
+int main(){
+   
+   struct { 
+      enum { ALL, SMALL } filter;
+      bool more_data;
+    } capture = { ALL, false };
+
+   for_each_file("c:", &capture, (void (void* p, const char* file_name)) 
+   {
+     typeof(capture) * captured = p;
+     if (captured->filter == ALL) {}
+   });
+}
+```
+
+## Static captures
+
+```c
+#include <stdio.h>
+
+void for_each_file(const char* path, 
+                   void* data,
+                   void (*f)(void* data, const char* filename));
+
+int main()
+{   
+   static int filter = 1;
+   for_each_file("c:", 0, (void (void* data, const char* file_name)) 
+   {   
+       if (filter == 1) {}
+   });
+}
+```
+
 
 ## Local function syntax
 ```
 block-item:
-           ...
-           <span style="color:blue">function-definition</span>
+    ...
+    <span style="color:blue">function-definition</span>
        
-       function-definition:
-           attribute-specifier-sequence opt declaration-specifiers declarator function-body
+function-definition:
+   attribute-specifier-sequence opt declaration-specifiers declarator function-body
 ```
 
 ## Forward declarations
@@ -242,29 +285,30 @@ int main()
 
 ##  Minimizing problems
 
-- We cannot have a "forward declaration" after the definition.
-- We should have only one "forward declaration" or none.
-- A local function must have only one definition per scope. 
+- We cannot have a forward declaration after the definition
+- We should have only one forward declaration for each function definition or none
+- A local function must have only one definition per scope 
  
 ## Function Literal syntax
  
 ```
-   postfix-expression: 
-            ...      
-            function-literal-definition
+postfix-expression: 
+   ...      
+   <span style="color:blue">function-literal-definition</span>
   
-      function-literal-definition:
-         ( attribute-specifier-sequence opt declaration-specifiers abstract-declarator ) 
-              function-body 
-       
+<span style="color:blue">function-literal-definition:
+   ( attribute-specifier-sequence opt declaration-specifiers abstract-declarator ) 
+         function-body</span>       
 
-       function-definition:
-          attribute-specifier-sequence opt declaration-specifiers declarator function-body
+function-definition:
+   attribute-specifier-sequence opt declaration-specifiers declarator function-body
 ```
 
 > The abstract-declarator portion of a function literal definition must have a function type.
 
 > Extra attribute-specifier-sequence may be necessary for [[unsequenced]] and similar
+
+> Compound literals cannot have a function type.
 
 
 ## Semantics
@@ -280,7 +324,7 @@ void main()
 ```
 ## File scope function literals
 
-```
+```c
 auto f = (int (int a)){ return a * 2; }; /* ok */
 ```
 
@@ -306,13 +350,13 @@ int main() {
 
 ## Returning VM types
 
-```
+```c
 #include <stdio.h>
-int main(){
+int main() {
     int n = 1;
     auto typeof(int [n])* local(void);
 
-    n  = 2;
+    n = 2;
     typeof(int [n])* local(void) {
        return 0;
     }    
@@ -328,7 +372,7 @@ int main(){
 
 ## Argument evaluation
 
-```
+```c
 #include <stdio.h>
 
 int main() {
@@ -361,7 +405,7 @@ int main() {
 
 - Function literals and local functions have access to the enclosing scope at the point of its definition.
 
-```
+```c
 int main() {
     
     struct X {int i; };
@@ -381,12 +425,9 @@ int main() {
 
 ## Automatic variables
 
-Identifiers referring to automatic variables of an enclosing function 
-cannot have their address resolved inside the body of a function literal or 
-local function. If they have VM types, this restriction also apply to resolving their type. 
+- Identifiers referring to automatic variables of an enclosing function cannot have their address resolved inside the body of a function literal or local function. <span style="color:gray">If they have VM types, this restriction also apply to resolving their type.</span>  
 
-```
-
+```c
 int main() {    
     int i = 2;
     void local() {    
@@ -395,7 +436,13 @@ int main() {
         int *p = &i;   /* constraint violation */
     };   
 }
+```
 
+## Automatic variables
+
+- <span style="color:gray">Identifiers referring to automatic variables of an enclosing function cannot have their address resolved inside the body of a function literal or local function. </span> If they have VM types, this restriction also apply to resolving their type. 
+
+```c
 void start(int n) {
     int a[n];
     void local() {    
@@ -405,23 +452,26 @@ void start(int n) {
 }
 ```
 
+
 ## Constants
 
-The same restrictions that apply to automatic variables also apply here, but we may 
-assume they can be read without having access to their address. 
+- The same restrictions apply to constants. However their values can be read without accessing memory.
 
 
-```
+```c
 int main() {
    constexpr int a = 1;
    const int b = 2;     /*N3693 Implicitly constexpr*/
+   const int j = get();
 
    void local() {     
      int x = a;   /* ok */             
      int *p = &a; /*constrain violation*/
      
-     n = b;       /* ok */             
+     x = b;       /* ok */             
      p = &b;      /*constrain violation*/
+
+     x = j;       /*constrain violation*/
    };
 }
 ```
@@ -431,7 +481,7 @@ int main() {
 
 ## Non-automatic variables
 
-```
+```c
 static int g = 1;
 
 int main() {
@@ -444,11 +494,10 @@ int main() {
    };
 }
 ```
-> For synchronous code, static variables can be an alternative to captures
 
 ## Function literal emulation in GCC
 
-```
+```c
 int main() {
     ({int _(int a) { return a * 2; } _;})(2);
 }
@@ -456,7 +505,7 @@ int main() {
 
 ## Generic functions
 
-```
+```c
 #define SWAP(a, b)\
     (void (typeof(a)* arg1, typeof(b)* arg2)) { \
     typeof(a) temp = *arg1; *arg1 = *arg2; *arg2 = temp; \
@@ -482,10 +531,10 @@ int main() {
 ```
 ## Function Literal address
 - Distinct function literals are not required to have unique addresses.
-- local functions?
+- Extend this to local functions?
 
 
-```
+```c
 int main(){
     auto pf1 = (void ()) { return 1 + 1; };
     auto pf2 = (void ()) { return 2; };
@@ -498,7 +547,7 @@ int main(){
 ##  Static variables inside function literals
 - static variables inside function literals will generate distinct functions
 
-```
+```c
 int main() {
     auto pf1 = (void ()) { static int i = 0; };
     auto pf2 = (void ()) { static int i = 0; };
@@ -510,16 +559,18 @@ int main() {
 
 - Keeps the grammar for functions and function literals in sync.
 - Keeps the existing scope rules for return types and parameters.
+- Do not create the expectation that the features are identical.
 
 ## Key points
 
 - Almost zero learning curve
 - Existing practice
 - Does not require trampolines or other hidden features.
+- If it looks like a function, then it is a function.
 - No forced capture strategy (by reference, by copy, stack, heap, etc.).
-- Works with existing APIs that use void* callbacks
+- Works with existing APIs that use `void *` callbacks
 - Lifetime problems may exist, but they are not new
-- Implementation is not complex
+- Keeps the compiler simple
 
 
 ## Next steps
