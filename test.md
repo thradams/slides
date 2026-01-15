@@ -580,8 +580,21 @@ int main() {
 -  Experimental implementation (Cake — missing VM type constraints)
 
 
-# Thank You
-Press ← → or Space to navigate.
+
+## Positive feedback on reddit
+
+>  Anyone else just want to be able to define anonymous functions/lambdas without capturing data? I feel like for callbacks this would already greatly improve convenience without adding the complexity full blown closures need. If I need to capture some data I'll gladly do it manually through a user pointer.
+
+> This would make some libraries relying on callbacks (like my own sm.h library) way more convenient and tidy to use. 
+
+>  it really does match what I've been hoping for for a while! I think it's a very intuitive approach that really does not change the nature of the language at all while adding a lot of convenience. 
+
+> This is exactly what most C community wants. Provide some convenient syntax for functions which usage is very localized and delegate all issues with passing captures and ensuring their lifetime are delegated to the programmer. 
+
+> Lambdas with no captures would be a simple and very convenient addition to C. It's quite frustrating that this feature did not land in C23. 
+
+> Keep the language small and simple. Keep the spirit of C.
+
 
 
 ## References
@@ -594,6 +607,11 @@ Press ← → or Space to navigate.
 -    N3694: Functions with Data https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3694.htm
 -    N3654: Accessing the Context of Nested Functions https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3654.pdf
 -    Reddit: https://www.reddit.com/r/C_Programming/comments/1omrrra/closures_in_c_yes/
-    http://cakecc.org/
+-    http://cakecc.org/
+
+
+# Thank You
+Press ← → or Space to navigate.
+
 
 
