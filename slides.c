@@ -122,6 +122,23 @@ int main(int argc, char** argv) {
             }
             continue;
         }
+        
+        /*smaller font for code*/
+        if (strcmp(line, "```csmall") == 0) {
+            if (!in_code) {
+                if (in_list) {
+                    fputs("  </ul>\n", out);
+                    in_list = false;
+                }
+                fputs("<pre><code class=\"language-c\" style=\"font-size:10px\">\n", out);
+                in_code = true;
+            }
+            else {
+                fputs("</code></pre>\n", out);
+                in_code = false;
+            }
+            continue;
+        }
 
         /* just pre */
         if (strcmp(line, "```") == 0) {

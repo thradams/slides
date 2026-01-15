@@ -25,7 +25,7 @@
 
 ## do this, then that...
 
-```c
+```csmall
 void part1_async(void* data, void (*callback)(int result, void* data));
     void part2_async(void* data, void (*callback)(int result, void* data));
 
