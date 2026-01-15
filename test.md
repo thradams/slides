@@ -282,13 +282,54 @@ int main()
     printf("%zu\n", _Countof(*f())); //3
 }
 ```
+ 
+## GCC Curiosity I
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    auto void local();
+
+    // error: nested function 'local' declared but never defined
+    void local() {
+        printf("1 ");        
+    }
+
+    local();
+
+    auto void local();
+
+}
+```
+
+## GCC Curiosity II
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    auto void local();
+
+    void local() { printf("1 "); }
+
+    local(); //prints 2
+
+    auto void local();
+
+    void local() { printf("2 "); }
+    local(); //prints 2
+}
+```
 
 ##  Minimizing problems
 
 - We cannot have a forward declaration after the definition
 - We should have only one forward declaration for each function definition or none
 - A local function must have only one definition per scope 
- 
+
 ## Function Literal syntax
  
 ```
@@ -380,14 +421,33 @@ int main() {
 
     void local(typeof(int[n])* p) 
     {
-         printf("%zu", _Countof(*p)); //prints 3
+         //does it need address of n?
+         printf("%zu", _Countof(*p)); 
     }
-
     n = 2;
-    int a[n];
-    
-    n = 3;
+    int a[n]; 
     local(&a);
+
+    //void (*pf) (typeof(int[n])* p) = local;
+    //pf(&a);
+}
+```
+
+## Argument evaluation
+
+```c
+#include <stdio.h>
+
+int main() {
+    int n = 1;
+
+    void local(int n, typeof(int [n])* a) 
+    {
+         printf("%zu", _Countof(*a)); //prints 2
+    }
+    
+    int a[2] = {1, 2}; 
+    local(2, &a);    
 }
 ```
 

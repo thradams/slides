@@ -435,6 +435,52 @@ int main()
 }
 </code>
 </pre>
+  <p> </p>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> GCC Curiosity I</h2>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main()
+{
+    auto void local();
+
+    // error: nested function 'local' declared but never defined
+    void local() {
+        printf("1 ");        
+    }
+
+    local();
+
+    auto void local();
+
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> GCC Curiosity II</h2>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main()
+{
+    auto void local();
+
+    void local() { printf("1 "); }
+
+    local(); //prints 2
+
+    auto void local();
+
+    void local() { printf("2 "); }
+    local(); //prints 2
+}
+</code>
+</pre>
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
@@ -444,7 +490,6 @@ int main()
     <li>We should have only one forward declaration for each function definition or none</li>
     <li>A local function must have only one definition per scope </li>
   </ul>
-  <p> </p>
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
@@ -547,14 +592,35 @@ int main() {
 
     void local(typeof(int[n])* p) 
     {
-         printf("%zu", _Countof(*p)); //prints 3
+         //does it need address of n?
+         printf("%zu", _Countof(*p)); 
     }
-
     n = 2;
-    int a[n];
-    
-    n = 3;
+    int a[n]; 
     local(&amp;a);
+
+    //void (*pf) (typeof(int[n])* p) = local;
+    //pf(&amp;a);
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Argument evaluation</h2>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main() {
+    int n = 1;
+
+    void local(int n, typeof(int [n])* a) 
+    {
+         printf("%zu", _Countof(*a)); //prints 2
+    }
+    
+    int a[2] = {1, 2}; 
+    local(2, &amp;a);    
 }
 </code>
 </pre>
