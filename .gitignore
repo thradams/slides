@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/slides.exe
+/slides.obj
+/.vs/slides/FileContentIndex
+/.vs/slides/v17
+/.vs
