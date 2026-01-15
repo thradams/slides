@@ -598,18 +598,19 @@ int main() {
 
 ## References
 
--    N3724: Discarded, https://www.open-std.org/JTC1/SC22/WG14/www/docs/n3724.pdf
+-    N3724: Discarded
 -    N3622 Allow calling static inline within extern inline
--    N3579: auto as a placeholder type specifier, v2, https://www.open-std.org/JTC1/SC22/WG14/www/docs/n3579.htm
--    N2956: Unsequenced functions https://www.open-std.org/JTC1/SC22/WG14/www/docs/n2956.htm
--    N3693: Integer Constant Expression-Initialized const Integer-Typed Declarations are Implicitly constexpr https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3693.htm
--    N3694: Functions with Data https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3694.htm
--    N3654: Accessing the Context of Nested Functions https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3654.pdf
+-    N3579: auto as a placeholder type specifier
+-    N2956: Unsequenced functions 
+-    N3693: Integer Constant Expression
+-    N3694: Functions with Data 
+-    N3654: Accessing the Context of Nested Functions
 -    Reddit: https://www.reddit.com/r/C_Programming/comments/1omrrra/closures_in_c_yes/
 -    http://cakecc.org/
 
 
 # Thank You
+
 Press ← → or Space to navigate.
 
 
