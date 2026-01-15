@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Local functions && Function literals</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="default.min.css">
+    <script src="highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: white;
+            color: black;
+            overflow: hidden;
+        }
+
+        pre {
+            background: #f3f3f3;
+            padding: 1em;
+            text-align: left;
+        }
+
+        /* Slide container */
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            
+        }
+
+        /* Individual slide */
+        section {
+            width: 100%;
+            height: 100%;
+            padding: 60px;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 50em;
+            margin: auto;
+        }
+
+        section.active {
+            display: flex;
+        }
+
+
+
+        /* Titles */
+        section h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Text */
+        section li {
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+
+        ul {
+            margin-left: 30px;
+        }
+
+
+
+        /* Footer */
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        .note {
+            background-color: #ffffff;
+            color: #222;
+            border: 1px solid #e5e5e5;
+            border-left: 4px solid #d0d0d0;
+
+            padding: 8px 10px;
+            margin: 8px 0;
+
+            border-radius: 6px;
+
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: smaller;
+            line-height: 1.6;
+
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+
+    </style>
+
+
+</head>
+
+<body>
+
+    <div class="presentation"><!---------------------------------------------------------------------------------------------->
+<section>
+  <h1>Local functions <br> && <br> Function literals</h1>
+  <h3> N3678 and N3679</h3>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Motivation</h2>
+<pre><code class="language-c">
+ void async(void* data, void (*callback)(int result, void* data));
+
+    struct start_capture {
+        int value;
+    };
+
+    static void start_callback(int result, void* data) {
+        struct start_capture* capture = data;
+        free(capture);
+    }
+
+    void start() {
+       struct start_capture* capture = calloc(1, sizeof *capture);
+       async(capture, start_callback);
+    }
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> do this, then that...</h2>
+<pre><code class="language-c">
+void part1_async(void* data, void (*callback)(int result, void* data));
+    void part2_async(void* data, void (*callback)(int result, void* data));
+
+    struct part1_capture {
+        int value;
+    };
+
+    struct part2_capture {
+        char ch;
+    };
+
+    static void part2_complete(int result, void* data);
+
+    static void part1_complete(int result, void* data) {
+       struct part1_capture* capture1 = data;
+
+        struct part2_capture* capture2 = calloc(1, sizeof *capture2);
+        part2_async(capture2, part2_complete);
+
+        free(capture2);
+    }
+
+    static void part2_complete(int result, void* data) {
+       struct part2_capture* capture2 = data;
+       free(capture2);
+    }
+
+    void start() {
+       struct part1_capture* capture1 = calloc(1, sizeof *capture1);
+       part1_async(capture1, part1_complete);
+    }
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Local functions</h2>
+<pre><code class="language-c">
+void async(void* data, void (*callback)(int result, void* data));
+
+    void start() {
+       
+       struct capture {
+            int value;
+        };
+
+       static void callback(int result, void* data) {
+            struct capture* capture = data;
+            free(capture);
+       }
+       
+       struct capture* capture = calloc(1, sizeof * capture);
+       async(capture, callback);
+    }
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Literal functions</h2>
+<pre><code class="language-c">
+    void async(void* data, void (*callback)(int result, void* data));
+
+    void start() {
+       
+       struct capture {
+            int value;
+       } capture = calloc(1, sizeof * capture);
+
+       async(capture, (void (int result, void* data)) 
+       {
+          struct capture* capture = data;
+          free(capture);
+       });
+    }
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Reusing captures</h2>
+<pre><code class="language-c">
+int main()
+{
+    struct capture { int id; }* capture = calloc(1, sizeof * capture);
+    login_async(capture,  (void (int id, void * p))
+    {
+        printf("login completed. id=%d\n", id);
+        struct capture * cap1 = p;
+        cap1-&gt;id = id;
+        get_data_async(cap1 /*moved*/, (void (const char* email, void * data))
+        {
+            struct capture * cap2 = data;
+            printf("your data='%s'  from id=%d\n", email, cap2-&gt;id);
+            free(cap2);
+        });
+    });
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Local function syntax</h2>
+<pre>
+block-item:
+           ...
+           <span style="color:blue">function-definition</span>
+       
+       function-definition:
+           attribute-specifier-sequence opt declaration-specifiers declarator function-body
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Forward declarations</h2>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main() {
+   void f();
+   f();
+   void f() { printf("local"); } 
+}
+
+void f() { printf("extern"); }
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> GCC Nested function solution</h2>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main() {
+   auto void f();
+   f();
+   /*auto*/ void f() { printf("local"); } 
+}
+
+void f() { printf("extern"); }
+</code>
+</pre>
+  <div class="note">See also: N3579 auto as a placeholder type specifier</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> GCC Nested function solution</h2>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main() {
+   void f();
+   f();
+   /*error: static declaration of 'f' follows non-static declaration*/
+   void f() { printf("local"); } 
+}
+
+void f() { printf("extern"); }
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Alternative I (static)</h2>
+<pre><code class="language-c">
+void f() { /*extern*/ }
+
+int main() {
+   
+   /*local functions*/
+   static void f(); /*local function declaration*/
+   static void f() { }   
+
+   /*GCC nested function*/
+   auto int f2();
+   int i = 1;              
+   int f2() { return i; }
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Alternative II (hybrid)</h2>
+<pre><code class="language-c">
+void f() { /*extern*/ }
+
+int main() {
+   static void f();
+   void f() { }
+      
+   /*static*/ int f1() { return 0; }   
+
+   int i = 1;              
+   int f1() { return i; /*GCC extension*/ }   
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Alternative III (same as gcc)</h2>
+<pre><code class="language-c">
+void f() { /*extern*/ }
+
+int main() {
+   auto void f();
+   /*auto*/ void f() { }
+
+   auto int f2();
+   int i = 1;              
+   int f2() { return i; /*GCC extension*/ }   
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Multiple forward declarations/definitions</h2>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main()
+{
+    int n = 1;
+    auto typeof(int [n])* f();
+    printf("%zu\n", _Countof(*f())); //1
+    
+    n = 2;
+    auto typeof(int [n])* f();
+    printf("%zu\n", _Countof(*f())); //2
+    
+    n = 3;
+    auto typeof(int [n])* f(){
+    }
+    printf("%zu\n", _Countof(*f())); //3
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2>  Minimizing problems</h2>
+  <ul>
+    <li>We cannot have a "forward declaration" after the definition.</li>
+    <li>We should have only one "forward declaration" or none.</li>
+    <li>A local function must have only one definition per scope. </li>
+  </ul>
+  <p> </p>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Function Literal syntax</h2>
+  <p> </p>
+<pre>
+   postfix-expression: 
+            ...      
+            function-literal-definition
+  
+      function-literal-definition:
+         ( attribute-specifier-sequence opt declaration-specifiers abstract-declarator ) 
+              function-body 
+       
+
+       function-definition:
+          attribute-specifier-sequence opt declaration-specifiers declarator function-body
+</pre>
+  <div class="note">The abstract-declarator portion of a function literal definition must have a function type.</div>
+  <div class="note">Extra attribute-specifier-sequence may be necessary for [[unsequenced]] and similar</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Semantics</h2>
+  <ul>
+    <li>The function literal is a function designator. (Behaves like a function, not a function pointer) </li>
+  </ul>
+<pre><code class="language-c">
+void main()
+{
+    (void (*pf1)(void)) = (void (void)){}; /* ok */
+    (void (*pf2)(void)) = &amp;(void (void)){}; /* ok */
+    &amp;(void (void)){} = 0;                  /* error: lvalue required */
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> File scope function literals</h2>
+<pre>
+auto f = (int (int a)){ return a * 2; }; /* ok */
+</pre>
+  <div class="note">I don't have a use case for that at the moment.</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Labels</h2>
+  <ul>
+    <li>Labels are not shared</li>
+    <li>Statements are not shared (break; continue)</li>
+  </ul>
+<pre><code class="language-c">
+int main() {
+    L1:;
+    (void (void)) {    
+        goto L1; /* error: label 'L1' used but not defined */
+    }();
+
+   void local() {     
+       goto L1; /* error: label 'L1' used but not defined */
+   };
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Returning VM types</h2>
+<pre>
+#include <stdio.h>
+int main(){
+    int n = 1;
+    auto typeof(int [n])* local(void);
+
+    n  = 2;
+    typeof(int [n])* local(void) {
+       return 0;
+    }    
+    
+    n = 3;
+    auto r = local();
+
+    n = 4;
+    printf("%zu", _Countof(*r)); //returns 2
+}
+</pre>
+  <div class="note">Following GCC implementation of nested functions</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Argument evaluation</h2>
+<pre>
+#include <stdio.h>
+
+int main() {
+    int n = 1;
+
+    void local(typeof(int[n])* p) 
+    {
+         printf("%zu", _Countof(*p)); //prints 3
+    }
+
+    n = 2;
+    int a[n];
+    
+    n = 3;
+    local(&a);
+}
+</pre>
+  <div class="note">Following GCC implementation of nested functions</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> __func__</h2>
+  <ul>
+    <li>The value of the string returned by __func__ is implementation-defined.</li>
+  </ul>
+  <div class="note">GCC returns the function name for nested functions</div>
+  <div class="note">C++ returns "operator ()" in lambdas</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Scope</h2>
+  <ul>
+    <li>Function literals and local functions have access to the enclosing scope at the point of its definition.</li>
+  </ul>
+<pre>
+int main() {
+    
+    struct X {int i; };
+    enum E {A};
+
+    (void (void)) {    
+        struct X x = {}; /* ok */
+        x.i = A;         /* ok */
+    }();
+
+   void local() {     
+     struct X x = {}; /* ok */
+     x.i = A;         /* ok */
+   };
+}
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Automatic variables</h2>
+  <p>Identifiers referring to automatic variables of an enclosing function </p>
+  <p>cannot have their address resolved inside the body of a function literal or </p>
+  <p>local function. If they have VM types, this restriction also apply to resolving their type. </p>
+<pre>
+
+int main() {    
+    int i = 2;
+    void local() {    
+        int j = sizeof(i); /* ok */
+        int  k = i;        /* constraint violation */
+        int *p = &i;   /* constraint violation */
+    };   
+}
+
+void start(int n) {
+    int a[n];
+    void local() {    
+        typeof(a) k;       /* constrain violation */
+        int m = sizeof(a); /* constrain violation */
+    };   
+}
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Constants</h2>
+  <p>The same restrictions that apply to automatic variables also apply here, but we may </p>
+  <p>assume they can be read without having access to their address. </p>
+<pre>
+int main() {
+   constexpr int a = 1;
+   const int b = 2;     /*N3693 Implicitly constexpr*/
+
+   void local() {     
+     int x = a;   /* ok */             
+     int *p = &a; /*constrain violation*/
+     
+     n = b;       /* ok */             
+     p = &b;      /*constrain violation*/
+   };
+}
+</pre>
+  <div class="note">Originally left as a possible option, it can be included</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Non-automatic variables</h2>
+<pre>
+static int g = 1;
+
+int main() {
+   static int i = 1;
+   
+   void local() {     
+     int j = sizeof(i); /* ok */
+     int k = i;         /* ok */
+     int m = g;         /* ok */     
+   };
+}
+</pre>
+  <div class="note">For synchronous code, static variables can be an alternative to captures</div>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Function literal emulation in GCC</h2>
+<pre>
+int main() {
+    ({int _(int a) { return a * 2; } _;})(2);
+}
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Generic functions</h2>
+<pre>
+#define SWAP(a, b)\
+    (void (typeof(a)* arg1, typeof(b)* arg2)) { \
+    typeof(a) temp = *arg1; *arg1 = *arg2; *arg2 = temp; \
+    }(&(a), &(b))
+
+int main() {
+    int a = 1;
+    int b = 2;
+
+    SWAP(a, b);
+    
+    (void (typeof(a)* arg1, typeof(b)* arg2)) { 
+        typeof(a) temp = *arg1;
+        *arg1 = *arg2; 
+        *arg2 = temp; 
+    }(&(a), &(b));
+
+
+    double da = 1.0;
+    double db = 2.0;
+    SWAP(da, db);
+}
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Function Literal address</h2>
+  <ul>
+    <li>Distinct function literals are not required to have unique addresses.</li>
+    <li>local functions?</li>
+  </ul>
+<pre>
+int main(){
+    auto pf1 = (void ()) { return 1 + 1; };
+    auto pf2 = (void ()) { return 2; };
+    auto pf3 = (void ()) { return 2; };
+    /* pf1 and pf2 and pf3 can have the same address */
+}
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2>  Static variables inside function literals</h2>
+  <ul>
+    <li>static variables inside function literals will generate distinct functions</li>
+  </ul>
+<pre>
+int main() {
+    auto pf1 = (void ()) { static int i = 0; };
+    auto pf2 = (void ()) { static int i = 0; };
+    assert(pf1 != pf2);
+}
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Why not C++ lambda syntax?</h2>
+  <ul>
+    <li>Keeps the grammar for functions and function literals in sync.</li>
+    <li>Keeps the existing scope rules for return types and parameters.</li>
+  </ul>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Key points</h2>
+  <ul>
+    <li>Almost zero learning curve</li>
+    <li>Existing practice</li>
+    <li>Does not require trampolines or other hidden features.</li>
+    <li>No forced capture strategy (by reference, by copy, stack, heap, etc.).</li>
+    <li>Works with existing APIs that use void<em> callbacks</em></li>
+    <li>Lifetime problems may exist, but they are not new</li>
+    <li>Implementation is not complex</li>
+  </ul>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Next steps</h2>
+  <ul>
+    <li> Improving the proposal, add wording</li>
+    <li> Deciding on forward-declaration syntax</li>
+    <li> Experimental implementation (Cake — missing VM type constraints)</li>
+  </ul>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h1>Thank You</h1>
+  <p>Press ← → or Space to navigate.</p>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> References</h2>
+  <ul>
+    <li>   N3724: Discarded, https://www.open-std.org/JTC1/SC22/WG14/www/docs/n3724.pdf</li>
+    <li>   N3622 Allow calling static inline within extern inline</li>
+    <li>   N3579: auto as a placeholder type specifier, v2, https://www.open-std.org/JTC1/SC22/WG14/www/docs/n3579.htm</li>
+    <li>   N2956: Unsequenced functions https://www.open-std.org/JTC1/SC22/WG14/www/docs/n2956.htm</li>
+    <li>   N3693: Integer Constant Expression-Initialized const Integer-Typed Declarations are Implicitly constexpr https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3693.htm</li>
+    <li>   N3694: Functions with Data https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3694.htm</li>
+    <li>   N3654: Accessing the Context of Nested Functions https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3654.pdf</li>
+    <li>   Reddit: https://www.reddit.com/r/C_Programming/comments/1omrrra/closures_in_c_yes/</li>
+  </ul>
+  <p>    http://cakecc.org/</p>
+</section>
+
+
+  <div class="footer">Slide N/N</div>
+  </div>
+
+    <script>
+        const start_time = Date.now();
+        const slides = document.querySelectorAll("section");
+        let currentSlide = 0;
+
+        function showSlide(index) {
+
+            const end_time = Date.now(); 
+            const duration_minutes = Math.round((end_time - start_time) / 60000);
+            const total = slides.length;
+            var footer = document.querySelector(".footer");
+            if (footer) {
+                footer.textContent = `Slide ${index + 1} / ${total}`;
+            }
+
+            slides.forEach((slide, i) => {
+                slide.classList.remove("active");
+            });
+
+            slides[index].classList.add("active");
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowRight" || e.key === " ") {
+                currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+                showSlide(currentSlide);
+            }
+
+            if (e.key === "ArrowLeft") {
+                currentSlide = Math.max(currentSlide - 1, 0);
+                showSlide(currentSlide);
+            }
+        });
+
+        // Initialize first slide
+        showSlide(currentSlide);
+    </script>
+</body>
+
+</html>
