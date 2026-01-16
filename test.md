@@ -365,34 +365,39 @@ int main() {
 - Keeps the grammar for functions and function literals in sync.
 - Keeps the existing scope rules for return types and parameters.
 - Do not create the expectation that the features are identical.
-
+- Return type deduction not required.
 ```c
 /*   C++   */
 int main() {
-    //error: return type 'struct f2()::X' is incomplete
+    //error: return type 'struct main()::X' is incomplete
     [] () ->  struct X { int i; } * { 
         return 0; 
     }();
 }
 ```
 
+> Return type deduction could be added using auto
+
 ## Why not C++ lambda syntax?
 
 - In C, it works exactly as expected under the existing rules.
- 
+
 ```c
 /*   C   */
 int main() {
     (struct X { int i; } *(void)) { 
         return 0; 
     }();
-    struct X x;
+    struct X x;    
 }
 ```
 
+> This could be necessary for someone using `vec(int)` with struct tag compatibility.
+
+> It does not create problems that were not considered before.
 
 ## Semantics
-- The function literal is a function designator. (Behaves like a function, not a function pointer) 
+- The function literal is a function designator. 
 
 ```c
 void main()
@@ -402,13 +407,21 @@ void main()
     &(void (void)){} = 0;                  /* error: lvalue required */
 }
 ```
+
+> Behaves like a function, not a function pointer
+
 ## File scope function literals
 
 ```c
 auto f = (int (int a)){ return a * 2; }; /* ok */
+
+int main()
+{
+}
 ```
 
 > I don't have a use case for that at the moment.
+
 
 ## Labels
 
