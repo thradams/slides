@@ -1,4 +1,4 @@
-﻿# Local functions <br> && <br> Function literals
+# Local functions <br> && <br> Function literals
 
 ### N3678 and N3679
 
@@ -352,6 +352,45 @@ function-definition:
 > Compound literals cannot have a function type.
 
 
+## Function literal emulation in GCC
+
+```c
+int main() {
+    ({int _(int a) { return a * 2; } _;})(2);
+}
+```
+
+## Why not C++ lambda syntax?
+
+- Keeps the grammar for functions and function literals in sync.
+- Keeps the existing scope rules for return types and parameters.
+- Do not create the expectation that the features are identical.
+
+```c
+/*   C++   */
+int main() {
+    //error: return type 'struct f2()::X' is incomplete
+    [] () ->  struct X { int i; } * { 
+        return 0; 
+    }();
+}
+```
+
+## Why not C++ lambda syntax?
+
+- In C, it works exactly as expected under the existing rules.
+ 
+```c
+/*   C   */
+int main() {
+    (struct X { int i; } *(void)) { 
+        return 0; 
+    }();
+    struct X x;
+}
+```
+
+
 ## Semantics
 - The function literal is a function designator. (Behaves like a function, not a function pointer) 
 
@@ -555,13 +594,6 @@ int main() {
 }
 ```
 
-## Function literal emulation in GCC
-
-```c
-int main() {
-    ({int _(int a) { return a * 2; } _;})(2);
-}
-```
 
 ## Generic functions
 
@@ -589,6 +621,7 @@ int main() {
     SWAP(da, db);
 }
 ```
+
 ## Function Literal address
 - Distinct function literals are not required to have unique addresses.
 - Extend this to local functions?
@@ -615,11 +648,7 @@ int main() {
 }
 ```
 
-## Why not C++ lambda syntax?
 
-- Keeps the grammar for functions and function literals in sync.
-- Keeps the existing scope rules for return types and parameters.
-- Do not create the expectation that the features are identical.
 
 ## Key points
 
