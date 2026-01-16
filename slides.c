@@ -410,7 +410,6 @@ const char* PART1
 
 const char* PART2
  =
- "        <!--PART2-->\n"
  "\n"
  "        <div class=\"footer\">Slide N/N</div>\n"
  "    </div>\n"
@@ -452,9 +451,7 @@ const char* PART2
  "\n"
  "        }\n"
  "\n"
- "\n"
- "        // Mouse click\n"
- "        document.addEventListener(\"click\", (e) =>\n"
+ "        function handleInput(x)\n"
  "        {\n"
  "            const width = window.innerWidth;\n"
  "\n"
@@ -465,8 +462,22 @@ const char* PART2
  "            {\n"
  "                nextSlide();\n"
  "            }\n"
+ "        }\n"
+ "\n"
+ "        // Mouse click\n"
+ "        document.addEventListener(\"click\", (e) =>\n"
+ "        {\n"
+ "            handleInput(e.clientX);\n"
  "        });\n"
  "\n"
+ "        // Touch\n"
+ "        document.addEventListener(\"touchstart\", (e) =>\n"
+ "        {\n"
+ "            if (e.touches.length > 0)\n"
+ "            {\n"
+ "                handleInput(e.touches[0].clientX);\n"
+ "            }\n"
+ "        });\n"
  "\n"
  "        document.addEventListener(\"keydown\", (e) =>\n"
  "        {\n"
@@ -486,4 +497,5 @@ const char* PART2
  "    </script>\n"
  "</body>\n"
  "\n"
- "";
+ "</html>";
+
