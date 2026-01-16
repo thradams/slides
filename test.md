@@ -80,6 +80,7 @@ void start() {
 ```
 
 ## Literal functions
+
 ```c
 void async(void* data, void (*callback)(int result, void* data));
 
@@ -117,6 +118,7 @@ int main()
     });
 }
 ```
+
 ## Captures on Stack
 
 ```c
