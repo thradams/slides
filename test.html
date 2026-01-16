@@ -912,40 +912,85 @@ int main() {
 </section>
 
 
-  <div class="footer">Slide N/N</div>
-  </div>
+
+        <div class="footer">Slide N/N</div>
+    </div>
 
     <script>
         const start_time = Date.now();
         const slides = document.querySelectorAll("section");
         let currentSlide = 0;
 
-        function showSlide(index) {
+        function showSlide(index)
+        {
 
-            const end_time = Date.now(); 
+            const end_time = Date.now();
             const duration_minutes = Math.round((end_time - start_time) / 60000);
             const total = slides.length;
             var footer = document.querySelector(".footer");
-            if (footer) {
+            if (footer)
+            {
                 footer.textContent = `Slide ${index + 1} / ${total}`;
             }
 
-            slides.forEach((slide, i) => {
+            slides.forEach((slide, i) =>
+            {
                 slide.classList.remove("active");
             });
 
             slides[index].classList.add("active");
         }
+        function nextSlide()
+        {
+            currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+            showSlide(currentSlide);
 
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowRight" || e.key === " ") {
-                currentSlide = Math.min(currentSlide + 1, slides.length - 1);
-                showSlide(currentSlide);
+        }
+        function previousSlide()
+        {
+            currentSlide = Math.max(currentSlide - 1, 0);
+            showSlide(currentSlide);
+
+        }
+
+        function handleInput(x)
+        {
+            const width = window.innerWidth;
+
+            if (x < width / 2)
+            {
+                previousSlide();
+            } else
+            {
+                nextSlide();
+            }
+        }
+
+        // Mouse click
+        document.addEventListener("click", (e) =>
+        {
+            handleInput(e.clientX);
+        });
+
+        // Touch
+        document.addEventListener("touchstart", (e) =>
+        {
+            if (e.touches.length > 0)
+            {
+                handleInput(e.touches[0].clientX);
+            }
+        });
+
+        document.addEventListener("keydown", (e) =>
+        {
+            if (e.key === "ArrowRight" || e.key === " ")
+            {
+                nextSlide();
             }
 
-            if (e.key === "ArrowLeft") {
-                currentSlide = Math.max(currentSlide - 1, 0);
-                showSlide(currentSlide);
+            if (e.key === "ArrowLeft")
+            {
+                previousSlide();
             }
         });
 
