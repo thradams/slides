@@ -527,9 +527,9 @@ int main() {
   <ul>
     <li>Keeps the grammar for functions and function literals in sync.</li>
     <li>Keeps the existing scope rules for return types and parameters.</li>
-    <li>Do not create the expectation that the features are identical.</li>
     <li>Return type deduction not required.</li>
   </ul>
+  <p> </p>
 <pre><code class="language-c">
 /*   C++   */
 int main() {
@@ -546,7 +546,8 @@ int main() {
 <section>
   <h2> Why not C++ lambda syntax?</h2>
   <ul>
-    <li>In C, it works exactly as expected under the existing rules.</li>
+    <li>Fits well with the existing concept of compound literals.</li>
+    <li>Do not create the expectation that the C and C++ features are identical.</li>
   </ul>
 <pre><code class="language-c">
 /*   C   */

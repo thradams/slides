@@ -364,8 +364,9 @@ int main() {
 
 - Keeps the grammar for functions and function literals in sync.
 - Keeps the existing scope rules for return types and parameters.
-- Do not create the expectation that the features are identical.
 - Return type deduction not required.
+
+ 
 ```c
 /*   C++   */
 int main() {
@@ -380,7 +381,8 @@ int main() {
 
 ## Why not C++ lambda syntax?
 
-- In C, it works exactly as expected under the existing rules.
+- Fits well with the existing concept of compound literals.
+- Do not create the expectation that the C and C++ features are identical.
 
 ```c
 /*   C   */
