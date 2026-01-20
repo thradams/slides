@@ -913,6 +913,8 @@ int main() {
 
 
 
+        <!--PART2-->
+
         <div class="footer">Slide N/N</div>
     </div>
 
@@ -953,34 +955,24 @@ int main() {
 
         }
 
-        function handleInput(x)
+
+        // Mouse click
+        document.addEventListener("pointerdown", (e) =>
         {
             const width = window.innerWidth;
+            const x = e.clientX;
 
-            if (x < width / 2)
+            if (x < (width / 6))
             {
                 previousSlide();
-            } else
+            } else if (x > (width  - width / 6))
             {
                 nextSlide();
             }
-        }
-
-        // Mouse click
-        document.addEventListener("click", (e) =>
-        {
-            handleInput(e.clientX);
+            e.preventDefault();
         });
 
-        // Touch
-        document.addEventListener("touchstart", (e) =>
-        {
-            if (e.touches.length > 0)
-            {
-                handleInput(e.touches[0].clientX);
-            }
-        });
-
+      
         document.addEventListener("keydown", (e) =>
         {
             if (e.key === "ArrowRight" || e.key === " ")
