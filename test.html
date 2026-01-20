@@ -965,11 +965,12 @@ int main() {
             if (x < (width / 6))
             {
                 previousSlide();
+                e.preventDefault();
             } else if (x > (width  - width / 6))
             {
                 nextSlide();
+                e.preventDefault();
             }
-            e.preventDefault();
         });
 
       
