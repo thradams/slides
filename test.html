@@ -297,6 +297,85 @@ int main()
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
+  <h2> Async implementation I</h2>
+<pre><code class="language-c">
+void async(void* data, void (*callback)(int result, void* data))
+{
+  struct capture {
+      void * data;
+      void (*callback)(int result, void* data);
+   } capture = calloc(1, sizeof * capture);
+   
+   if (capture == NULL) {
+      callback(1, data);
+      return;
+   }
+   
+   capture-&gt;data = data;
+   capture-&gt;callback = callback;
+
+   thread_pool(capture, (void (void* data))
+   {
+      struct capture* capture = data;      
+      capture-&gt;callback(0, capture-&gt;data);
+      free(capture);
+   });
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Async implementation II</h2>
+<pre><code class="language-c">
+void async(void* data, void (*callback)(int result, void* data))
+{
+  struct capture {
+      void * data*;
+      void (*callback)(int result, void* data);
+   } capture = {data, callback};
+   
+   thread_pool(capture, sizeof capture, (void (void* data)) 
+   {
+      struct capture* capture = data;     
+      
+      /* task */
+
+      capture-&gt;callback(0, capture-&gt;data);
+   });
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Async implementation III</h2>
+<pre><code class="language-c">
+void async(void* data, void (*callback)(int result, void* data))
+{
+  struct capture {
+      void * data*;
+      void (*callback)(int result, void* data);
+   } capture = {data, callback};
+   
+   thread_pool(capture, sizeof capture, (void (void* data))
+   {
+      struct capture* capture = data;     
+      
+      /* task */
+
+      dispatch(capture, sizeof capture, (void (void* data))) 
+      {
+         struct capture* capture = data;     
+         capture-&gt;callback(0, capture-&gt;data);
+      });      
+   });
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
   <h2> Local function syntax</h2>
 <pre>
 block-item:

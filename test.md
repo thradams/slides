@@ -162,8 +162,81 @@ int main()
 }
 ```
 
+## Async implementation I
+
+```c
+void async(void* data, void (*callback)(int result, void* data))
+{
+  struct capture {
+      void * data;
+      void (*callback)(int result, void* data);
+   } capture = calloc(1, sizeof * capture);
+   
+   if (capture == NULL) {
+      callback(1, data);
+      return;
+   }
+   
+   capture->data = data;
+   capture->callback = callback;
+
+   thread_pool(capture, (void (void* data))
+   {
+      struct capture* capture = data;      
+      capture->callback(0, capture->data);
+      free(capture);
+   });
+}
+```
+
+## Async implementation II
+```c
+void async(void* data, void (*callback)(int result, void* data))
+{
+  struct capture {
+      void * data*;
+      void (*callback)(int result, void* data);
+   } capture = {data, callback};
+   
+   thread_pool(capture, sizeof capture, (void (void* data)) 
+   {
+      struct capture* capture = data;     
+      
+      /* task */
+
+      capture->callback(0, capture->data);
+   });
+}
+```
+
+## Async implementation III
+
+```c
+void async(void* data, void (*callback)(int result, void* data))
+{
+  struct capture {
+      void * data*;
+      void (*callback)(int result, void* data);
+   } capture = {data, callback};
+   
+   thread_pool(capture, sizeof capture, (void (void* data))
+   {
+      struct capture* capture = data;     
+      
+      /* task */
+
+      dispatch(capture, sizeof capture, (void (void* data))) 
+      {
+         struct capture* capture = data;     
+         capture->callback(0, capture->data);
+      });      
+   });
+}
+```
+
 
 ## Local function syntax
+
 ```
 block-item:
     ...
@@ -331,6 +404,8 @@ int main()
 - We cannot have a forward declaration after the definition
 - We should have only one forward declaration for each function definition or none
 - A local function must have only one definition per scope 
+
+> new: not at the N3678 yet
 
 ## Function Literal syntax
  
