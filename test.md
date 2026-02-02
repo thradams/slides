@@ -424,9 +424,7 @@ function-definition:
 
 > The abstract-declarator portion of a function literal definition must have a function type.
 
-> Extra attribute-specifier-sequence may be necessary for [[unsequenced]] and similar
-
-> Compound literals cannot have a function type.
+> Disambiguation: Compound literals cannot have a function type.
 
 
 ## Function literal emulation in GCC
@@ -753,20 +751,6 @@ int main() {
 - No new problems. Lifetime issues may exist, but they are not new.
 - We are adding convenience improving safety and maintainability.
 - Keeps the compiler simple
-
-## Positive feedback on reddit
-
->  Anyone else just want to be able to define anonymous functions/lambdas without capturing data? I feel like for callbacks this would already greatly improve convenience without adding the complexity full blown closures need. If I need to capture some data I'll gladly do it manually through a user pointer.
-
-> This would make some libraries relying on callbacks (like my own sm.h library) way more convenient and tidy to use. 
-
->  it really does match what I've been hoping for for a while! I think it's a very intuitive approach that really does not change the nature of the language at all while adding a lot of convenience. 
-
-> This is exactly what most C community wants. Provide some convenient syntax for functions which usage is very localized and delegate all issues with passing captures and ensuring their lifetime are delegated to the programmer. 
-
-> Lambdas with no captures would be a simple and very convenient addition to C. It's quite frustrating that this feature did not land in C23. 
-
-> Keep the language small and simple. Keep the spirit of C.
 
 
 
