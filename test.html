@@ -490,30 +490,6 @@ int main() {
 }
 </code>
 </pre>
-</section>
-<!---------------------------------------------------------------------------------------------->
-<section>
-  <h2> Multiple forward declarations/definitions</h2>
-<pre><code class="language-c">
-#include &lt;stdio.h&gt;
-
-int main()
-{
-    int n = 1;
-    auto typeof(int [n])* f();
-    printf("%zu\n", _Countof(*f())); //1
-    
-    n = 2;
-    auto typeof(int [n])* f();
-    printf("%zu\n", _Countof(*f())); //2
-    
-    n = 3;
-    auto typeof(int [n])* f(){
-    }
-    printf("%zu\n", _Countof(*f())); //3
-}
-</code>
-</pre>
   <p> </p>
 </section>
 <!---------------------------------------------------------------------------------------------->
@@ -568,6 +544,7 @@ int main()
     <li>We cannot have a forward declaration after the definition</li>
     <li>We should have only one forward declaration for each function definition or none</li>
     <li>A local function must have only one definition per scope </li>
+    <li>Forward declarations are scoped.</li>
   </ul>
   <div class="note">new: not at the N3678 yet</div>
 </section>
@@ -592,21 +569,11 @@ function-definition:
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
-  <h2> Function literal emulation in GCC</h2>
-<pre><code class="language-c">
-int main() {
-    ({int _(int a) { return a * 2; } _;})(2);
-}
-</code>
-</pre>
-</section>
-<!---------------------------------------------------------------------------------------------->
-<section>
   <h2> Why not C++ lambda syntax?</h2>
   <ul>
     <li>Keeps the grammar for functions and function literals in sync.</li>
     <li>Keeps the existing scope rules for return types and parameters.</li>
-    <li>Return type deduction not required.</li>
+    <li>Return type deduction not required. (could be added with auto)</li>
   </ul>
   <p> </p>
 <pre><code class="language-c">
@@ -619,7 +586,7 @@ int main() {
 }
 </code>
 </pre>
-  <div class="note">Return type deduction could be added using auto</div>
+  <div class="note">This could be necessary for someone using <code>vec(int)</code> with struct tag compatibility.</div>
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
@@ -638,14 +605,13 @@ int main() {
 }
 </code>
 </pre>
-  <div class="note">This could be necessary for someone using <code>vec(int)</code> with struct tag compatibility.</div>
   <div class="note">It does not create problems that were not considered before.</div>
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
   <h2> Semantics</h2>
   <ul>
-    <li>The function literal is a function designator. </li>
+    <li>The function literal is a function designator. (Behaves like a function, not a function pointer)</li>
   </ul>
 <pre><code class="language-c">
 void main()
@@ -656,7 +622,6 @@ void main()
 }
 </code>
 </pre>
-  <div class="note">Behaves like a function, not a function pointer</div>
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
@@ -978,6 +943,40 @@ int main() {
 <section>
   <h1>Thank You</h1>
   <p>Press ← → or Space to navigate.</p>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Function literal emulation in GCC</h2>
+<pre><code class="language-c">
+int main() {
+    ({int _(int a) { return a * 2; } _;})(2);
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
+  <h2> Multiple forward declarations/definitions</h2>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main()
+{
+    int n = 1;
+    auto typeof(int [n])* f();
+    printf("%zu\n", _Countof(*f())); //1
+    
+    n = 2;
+    auto typeof(int [n])* f();
+    printf("%zu\n", _Countof(*f())); //2
+    
+    n = 3;
+    auto typeof(int [n])* f(){
+    }
+    printf("%zu\n", _Countof(*f())); //3
+}
+</code>
+</pre>
 </section>
 
 

@@ -336,27 +336,6 @@ int main() {
 }
 ```
 
-## Multiple forward declarations/definitions
-
-```c
-#include <stdio.h>
-
-int main()
-{
-    int n = 1;
-    auto typeof(int [n])* f();
-    printf("%zu\n", _Countof(*f())); //1
-    
-    n = 2;
-    auto typeof(int [n])* f();
-    printf("%zu\n", _Countof(*f())); //2
-    
-    n = 3;
-    auto typeof(int [n])* f(){
-    }
-    printf("%zu\n", _Countof(*f())); //3
-}
-```
  
 ## GCC Curiosity I
 
@@ -404,6 +383,7 @@ int main()
 - We cannot have a forward declaration after the definition
 - We should have only one forward declaration for each function definition or none
 - A local function must have only one definition per scope 
+- Forward declarations are scoped.
 
 > new: not at the N3678 yet
 
@@ -427,19 +407,13 @@ function-definition:
 > Disambiguation: Compound literals cannot have a function type.
 
 
-## Function literal emulation in GCC
 
-```c
-int main() {
-    ({int _(int a) { return a * 2; } _;})(2);
-}
-```
 
 ## Why not C++ lambda syntax?
 
 - Keeps the grammar for functions and function literals in sync.
 - Keeps the existing scope rules for return types and parameters.
-- Return type deduction not required.
+- Return type deduction not required. (could be added with auto)
 
  
 ```c
@@ -452,7 +426,8 @@ int main() {
 }
 ```
 
-> Return type deduction could be added using auto
+> This could be necessary for someone using `vec(int)` with struct tag compatibility.
+
 
 ## Why not C++ lambda syntax?
 
@@ -469,12 +444,11 @@ int main() {
 }
 ```
 
-> This could be necessary for someone using `vec(int)` with struct tag compatibility.
 
 > It does not create problems that were not considered before.
 
 ## Semantics
-- The function literal is a function designator. 
+- The function literal is a function designator. (Behaves like a function, not a function pointer)
 
 ```c
 void main()
@@ -485,7 +459,6 @@ void main()
 }
 ```
 
-> Behaves like a function, not a function pointer
 
 ## File scope function literals
 
@@ -766,7 +739,6 @@ int main() {
 -    N3724: Discarded
 -    N3622 Allow calling static inline within extern inline
 -    N3579: auto as a placeholder type specifier
--    N2956: Unsequenced functions 
 -    N3693: Integer Constant Expression
 -    N3694: Functions with Data 
 -    N3654: Accessing the Context of Nested Functions
@@ -779,4 +751,33 @@ int main() {
 Press ← → or Space to navigate.
 
 
+## Function literal emulation in GCC
+
+```c
+int main() {
+    ({int _(int a) { return a * 2; } _;})(2);
+}
+```
+
+## Multiple forward declarations/definitions
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int n = 1;
+    auto typeof(int [n])* f();
+    printf("%zu\n", _Countof(*f())); //1
+    
+    n = 2;
+    auto typeof(int [n])* f();
+    printf("%zu\n", _Countof(*f())); //2
+    
+    n = 3;
+    auto typeof(int [n])* f(){
+    }
+    printf("%zu\n", _Countof(*f())); //3
+}
+```
 
