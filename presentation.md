@@ -59,6 +59,27 @@ void start() {
 }
 ```
 
+
+## Motivation
+
+```c
+void async(void* data, void (*callback)(int result, void* data));
+
+struct start_capture {
+   int value;
+};
+
+static void start_callback(int result, void* data) {
+   struct start_capture* capture = data;
+   free(capture);
+}
+
+void start() {
+   struct start_capture* capture = calloc(1, sizeof *capture);
+   async(capture, start_callback);
+}
+```
+
 ## Local functions
 ```c
 void async(void* data, void (*callback)(int result, void* data));
@@ -378,14 +399,14 @@ int main()
 }
 ```
 
-##  Minimizing problems
+##  Local functions and scope
 
-- We cannot have a forward declaration after the definition
-- We should have only one forward declaration for each function definition or none
 - A local function must have only one definition per scope 
 - Forward declarations are scoped.
-
-> new: not at the N3678 yet
+- warning: Forward declaration after the definition
+- warning: Multiple forward declarations
+ 
+> obs: not at the N3678 yet
 
 ## Function Literal syntax
  
@@ -721,7 +742,7 @@ int main() {
 - If it looks like a function, then it is a function.
 - No forced capture strategy (by reference, by copy, stack, heap, etc.).
 - Works with existing APIs that use `void *` callbacks
-- No new problems. Lifetime issues may exist, but they are not new.
+- We are not adding new problems. 
 - We are adding convenience improving safety and maintainability.
 - Keeps the compiler simple
 
@@ -730,7 +751,7 @@ int main() {
 ## Road map
 
 -  Improving the proposal, add wording maybe merge in one proposal?
--  Deciding on forward-declaration syntax
+-  Deciding on forward-declaration syntax (static x auto)
 -  Experimental implementation http://cakecc.org/ (missing VM types)
 
 

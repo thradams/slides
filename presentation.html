@@ -183,6 +183,28 @@ void start() {
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
+  <h2> Motivation</h2>
+<pre><code class="language-c">
+void async(void* data, void (*callback)(int result, void* data));
+
+struct start_capture {
+   int value;
+};
+
+static void start_callback(int result, void* data) {
+   struct start_capture* capture = data;
+   free(capture);
+}
+
+void start() {
+   struct start_capture* capture = calloc(1, sizeof *capture);
+   async(capture, start_callback);
+}
+</code>
+</pre>
+</section>
+<!---------------------------------------------------------------------------------------------->
+<section>
   <h2> Local functions</h2>
 <pre><code class="language-c">
 void async(void* data, void (*callback)(int result, void* data));
@@ -539,14 +561,15 @@ int main()
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
-  <h2>  Minimizing problems</h2>
+  <h2>  Local functions and scope</h2>
   <ul>
-    <li>We cannot have a forward declaration after the definition</li>
-    <li>We should have only one forward declaration for each function definition or none</li>
     <li>A local function must have only one definition per scope </li>
     <li>Forward declarations are scoped.</li>
+    <li>warning: Forward declaration after the definition</li>
+    <li>warning: Multiple forward declarations</li>
   </ul>
-  <div class="note">new: not at the N3678 yet</div>
+  <p> </p>
+  <div class="note">obs: not at the N3678 yet</div>
 </section>
 <!---------------------------------------------------------------------------------------------->
 <section>
@@ -910,7 +933,7 @@ int main() {
     <li>If it looks like a function, then it is a function.</li>
     <li>No forced capture strategy (by reference, by copy, stack, heap, etc.).</li>
     <li>Works with existing APIs that use <code>void *</code> callbacks</li>
-    <li>No new problems. Lifetime issues may exist, but they are not new.</li>
+    <li>We are not adding new problems. </li>
     <li>We are adding convenience improving safety and maintainability.</li>
     <li>Keeps the compiler simple</li>
   </ul>
@@ -920,7 +943,7 @@ int main() {
   <h2> Road map</h2>
   <ul>
     <li> Improving the proposal, add wording maybe merge in one proposal?</li>
-    <li> Deciding on forward-declaration syntax</li>
+    <li> Deciding on forward-declaration syntax (static x auto)</li>
     <li> Experimental implementation http://cakecc.org/ (missing VM types)</li>
   </ul>
 </section>
